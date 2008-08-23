@@ -9,7 +9,7 @@
  *
  */
 
-var BarChar = function(n) {
+var BarChart = function(n) {
 
 	this.barras = n;
 	var head = document.getElementsByTagName("head").item(0);
@@ -42,18 +42,8 @@ var BarChar = function(n) {
 	body.appendChild(this.moldura);
 }
 
-/*
-* Add CSS - Tag Link
-*/
-BarChar.prototype.addStyle = function() {
-	var style = document.createElement("link");
-	style.setAttribute("href", "grafico.css");
-	style.setAttribute("type", "text/css");
-	style.setAttribute("rel", "stylesheet");
-	return style;
-}
 
-BarChar.prototype.getColor = function() {
+BarChart.prototype.getColor = function() {
 	var r = Math.round(Math.random()*99);
 	r = (r<=9)?"0"+r:r;
 	var g = Math.round(Math.random()*99);
@@ -63,39 +53,39 @@ BarChar.prototype.getColor = function() {
 	return "#"+r+g+b;
 }
 
-BarChar.prototype.setSize = function(size) {
+BarChart.prototype.setSize = function(size) {
 	this.moldura.style.width = size;
 }
 
-BarChar.prototype.getSize = function() {
+BarChart.prototype.getSize = function() {
 	return this.moldura.style.width;
 }
 
-BarChar.prototype.setTitle = function(title) {
+BarChart.prototype.setTitle = function(title) {
 	this.getTitle().innerHTML = title;
 }
 
-BarChar.prototype.getTitle = function() {
+BarChart.prototype.getTitle = function() {
 	return this.moldura.getElementsByTagName("h2").item(0);
 }
 
-BarChar.prototype.setSource = function(source) {
+BarChart.prototype.setSource = function(source) {
 	this.getSource().innerHTML = source;
 }
 
-BarChar.prototype.getSource = function() {
+BarChart.prototype.getSource = function() {
 	return this.moldura.getElementsByTagName("p").item(0);
 }
 
-BarChar.prototype.getBarra = function(n) {
+BarChart.prototype.getBarra = function(n) {
 	return document.getElementById("barra"+n);
 }
 
-BarChar.prototype.getLabel = function(n) {
+BarChart.prototype.getLabel = function(n) {
 	return document.getElementById("label"+n);
 }
 
-BarChar.prototype.setBarraLabel = function(n, name) {
+BarChart.prototype.setBarraLabel = function(n, name) {
 	var label = this.getLabel(n);
 	var barra = this.getBarra(n);
 	label.style.width = this.getSize();
@@ -103,17 +93,17 @@ BarChar.prototype.setBarraLabel = function(n, name) {
 	barra.setAttribute("title", name+" - "+this.getBarraSize(n));
 }
 
-BarChar.prototype.setBarraSize = function(n, size) {
+BarChart.prototype.setBarraSize = function(n, size) {
 	var barra = this.getBarra(n);
 	barra.style.width = size;
 }
 
-BarChar.prototype.getBarraSize = function(n, size) {
+BarChart.prototype.getBarraSize = function(n, size) {
 	var barra = this.getBarra(n);
 	return barra.style.width;
 }
 
-BarChar.prototype.setBarraLink = function(n, url) {
+BarChart.prototype.setBarraLink = function(n, url) {
 	var barra = this.getBarra(n);
 	barra.setAttribute("href", url);
 }
