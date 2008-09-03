@@ -1,4 +1,0 @@
-
-var AlertDialog = function() {
-
-}
