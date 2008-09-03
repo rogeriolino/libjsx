@@ -18,10 +18,10 @@ var DataGrid = function(lin, col) {
 
 	var self = this;
 	// if not will set a name, a random name is maked
-	this.name = "datagrid"+Math.floor(Math.random()*99)+Math.floor(Math.random()*99);
+	this.name = "datagrid";
 	
-	this.linhas = lin;
-	this.colunas = col;
+	this.rows = new Array(lin);
+	
 	this.width;
 	this.height;
 	this.font = "Sans-serif";
@@ -54,60 +54,54 @@ var DataGrid = function(lin, col) {
 		var div;
 		var thead = document.createElement("thead");
 		if (document.all) {
-			thead.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_rows' name='"+self.getName()+"_rows' value='"+self.linhas+"' />"));
-			thead.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_cols' name='"+self.getName()+"_cols' value='"+self.colunas+"' />"));
+			thead.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_rows' name='"+self.getName()+"_rows' value='"+lin+"' />"));
+			thead.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_cols' name='"+self.getName()+"_cols' value='"+col+"' />"));
 		} else {
 			var n_linhas = document.createElement("input");
 			n_linhas.setAttribute("type", "hidden");
 			n_linhas.setAttribute("id", self.getName()+"_rows");
 			n_linhas.setAttribute("name", self.getName()+"_rows");
-			n_linhas.setAttribute("value", self.linhas);
+			n_linhas.setAttribute("value", lin);
 			
 			var n_colunas = document.createElement("input");
 			n_colunas.setAttribute("type", "hidden");
 			n_colunas.setAttribute("id", self.getName()+"_cols");
 			n_colunas.setAttribute("name", self.getName()+"_cols");
-			n_colunas.setAttribute("value", self.colunas);
+			n_colunas.setAttribute("value", col);
 			
 			thead.appendChild(n_linhas);			
 			thead.appendChild(n_colunas);
 		}
 		self.datagrid.appendChild(thead);
-		var tbody = document.createElement("tbody");
-		for (var i=0; i<self.linhas; i++) {
-			linha = document.createElement("tr");
-			linha.style.background = self.getRowBg();
-			for (var j=0; j<self.colunas; j++) {
-				if (document.all) { // if IE then welcome to the gambias
-					input = document.createElement("<input type='hidden'  id='"+self.getName()+"_"+i+"_"+j+"'  name='"+self.getName()+"_"+i+"_"+j+"' />");
-				} else {
-					input = document.createElement("input");
-					input.setAttribute("type", "hidden");
-					input.setAttribute("id", self.getName()+"_"+i+"_"+j);
-					input.setAttribute("name", self.getName()+"_"+i+"_"+j);
-				}
-				input.setAttribute("type", "hidden");
-				div = document.createElement("div");
-				div.innerHTML = "&nbsp;";
-				with (div.style) {
-					width = self.getCelWidth()+"px";
+		var tbody = document.createElement("tbody");		
+		
+		for (var i=0; i<self.rows.length; i++) {		
+			linha = new Row();
+			linha.getRow().style.background = self.getRowBg();
+			self.rows[i] = linha;
+			
+			for (var j=0; j<col; j++) {
+				
+				var cell = new Cell(self.getName()+"_"+i+"_"+j);				
+				linha.add(cell);
+				
+				with (cell.getDiv().style) {
+					width = self.getWidth()+"px";
 					font = self.getFontSize()+"px "+self.getFont();
 					color = self.getFontColor();
 					textAlign = self.getTextAlign();
 					// the IE dont like of overflow
 					if (!document.all) overflow = self.getCelOverflow();
 				}
-				coluna = document.createElement("td");
-				coluna.appendChild(input);
-				coluna.appendChild(div);
-				with(coluna.style) {
+				
+				with (linha.get(j).getColumn().style) {
 					width = self.getCelWidth()+"px";
 					height = self.getCelHeight()+"px";
 					border = self.getCelBorderPx()+"px "+self.getCelBorderStyle()+" "+self.getCelBorderColor();
-				}
-				linha.appendChild(coluna);
+				}								
+				
 			}
-			tbody.appendChild(linha);
+			tbody.appendChild(linha.getRow());
 		}
 		self.datagrid.appendChild(tbody);
 	}
@@ -240,14 +234,14 @@ var DataGrid = function(lin, col) {
 		return self.cel_border_style;
 	}
 	
-	this.setCurrentCel = function(cel) {
-		var anterior = self.getCurrentCel();
+	this.setCurrentColumn = function(cel) {
+		var anterior = self.getCurrentColumn();
 		if (anterior != null)
 			anterior.style.borderColor = self.getCelBorderColor();
 		self.cel_atual = cel;
 	}
 	
-	this.getCurrentCel = function() {
+	this.getCurrentColumn = function() {
 		return self.cel_atual;
 	}
 	
@@ -277,7 +271,7 @@ var DataGrid = function(lin, col) {
 	this.onRowChange = function() {
 		var linhas = self.getRows();
 		for (var i=0; i<linhas.length; i++) {
-			linhas[i].onmousedown = function() {
+			linhas[i].getRow().onmousedown = function() {
 				self.setCurrentRow(this);
 				self.removeInput();
 				this.style.background = self.getRowSelectedBg();
@@ -289,18 +283,18 @@ var DataGrid = function(lin, col) {
 		var colunas;
 		var linhas = self.getRows();
 		for (var i=0; i<linhas.length; i++) {
-			colunas = self.getCols(i);
+			colunas = self.getColumns(i);
 			for (var j=0; j<colunas.length; j++) {
-				colunas[j].onclick = function() {
-					self.setCurrentCel(this);
+				colunas[j].getColumn().onclick = function() {
+					self.setCurrentColumn(this);
 					self.highlightCel();
 				}
-				colunas[j].ondblclick = function() {
-					self.setCurrentCel(this);
+				colunas[j].getColumn().ondblclick = function() {
+					self.setCurrentColumn(this);
 					self.highlightCel();
 					self.changeForEditable(this, true);
 				}
-				colunas[j].onkeypress = function(e) {
+				colunas[j].getColumn().onkeypress = function(e) {
 					var key = (window.event)?event.keyCode:e.keyCode;
 					if (key == 13) // <ENTER>
 						self.changeForEditable(this, false);
@@ -316,72 +310,30 @@ var DataGrid = function(lin, col) {
 			self.removeInput();
 	}
 	
-	this.createInput = function(cel) {
-		var div = cel.childNodes[1];
-		var value = (div.innerHTML != "&nbsp;")?div.innerHTML:"";
-		var input = cel.childNodes[0];
-		if (document.all) { // if IE then welcome to the gambias
-			var name = input.name;
-			cel.innerHTML = "";
-			input = document.createElement("<input type='text' id='"+name+"' name='"+name+"' style='width: "+self.getCelWidth()+"px; height: "+self.getCelHeight()+"px;' />");
-			input.setAttribute("value", value);
-			cel.appendChild(input);
-			cel.appendChild(div);
-			input.focus();
-			input.select();			
-		} else {			
-			input.setAttribute('type', 'text');
-			input.setAttribute("value", value);
-			input.style.width = self.getCelWidth()+"px";
-			input.style.height = self.getCelHeight()+"px";
-			input.focus();
-			input.select();
-			div.innerHTML = "";
-		}
-	}
-	
 	this.removeInput = function() {
-		if (self.getCurrentCel() != null) {
-			var cel = self.getCurrentCel();
-			var input = cel.childNodes[0];
-			if (input.getAttribute("type") == "text") {
-				if (document.all) { // if IE then welcome to the gambias
-					var name = input.name;				
-					var div = cel.childNodes[1];
-					cel.innerHTML = "";
-					var value = (input.value != "")?input.value:"&nbsp;";
-					input = document.createElement("<input type='hidden' name='"+name+"' />");
-					input.setAttribute("value", value);
-					div.innerHTML = value;
-					cel.appendChild(input);
-					cel.appendChild(div);
-				} else {
-					var div = cel.childNodes[1];
-					var value = (input.value != "")?input.value:"&nbsp;";
-					input.setAttribute("type", "hidden");
-					input.value = value;
-					div.innerHTML = value;
-				}
-			}
+		var col = self.getCurrentColumn(); 
+		if (col != null) {
+			col.getCell().removeInput();
 		}
 	}
-
+	
+	
 	this.getRows = function() {
-		return self.datagrid.getElementsByTagName("tr");
+		return self.rows;
 	}
 	
-	this.getRow = function(lin) {
+	this.getRow = function(row) {
 		var linhas = self.getRows();
-		return linhas[lin];
+		return linhas[row];
 	}
 	
-	this.getCols = function(lin) {
-		var linha = self.getRow(lin);
-		return linha.getElementsByTagName("td");
+	this.getColumns = function(row) {
+		var linha = self.getRow(row);
+		return linha.getColumns();
 	}
 	
-	this.getCel = function(lin, col) {
-		var colunas = self.getCols(lin);
+	this.getCell = function(row, col) {
+		var colunas = self.getColumns(row);
 		return colunas[col];
 	}
 	
