@@ -1,16 +1,22 @@
 
-var Row = function() {
+var Row = function(datagrid) {
 
 	var self = this;
+	this.datagrid = datagrid;
 	this.cols = new Array();
 	this.row = document.createElement("tr");
+	
+	this.row.onclick = function() {
+		self.datagrid.highlightCell();
+		self.datagrid.setCurrentColumn(self);
+	}
 	
 	this.getSize = function() {
 		return self.cols.length;
 	}
 	
 	this.add = function(cell) {
-		var col = new Column(cell);
+		var col = new Column(self.datagrid, cell);
 		self.cols[self.getSize()] = col;
 		self.row.appendChild(col.getColumn());
 	}
@@ -27,6 +33,6 @@ var Row = function() {
 	
 	this.getRow = function() {
 		return self.row;
-	}	
+	}
 
 }
