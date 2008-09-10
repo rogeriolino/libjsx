@@ -3,13 +3,24 @@ var Row = function(datagrid) {
 
 	var self = this;
 	this.datagrid = datagrid;
-	this.cols = new Array();
+	this.cols = new Array();	
+	this.title = false;
+	
 	this.row = document.createElement("tr");
+	this.row.className = self.datagrid.ROW_CLASS;
+	
+	this.isTitle = function() {
+		return self.title;
+	}
+	
+	this.setTitle = function(t) {
+		self.title = t;
+	}
 	
 	this.row.onclick = function() {
-		self.datagrid.highlightCell();
-		self.datagrid.setCurrentColumn(self);
-	}
+		if (!self.isTitle())
+			self.datagrid.setCurrentRow(self);
+	}		
 	
 	this.getSize = function() {
 		return self.cols.length;
