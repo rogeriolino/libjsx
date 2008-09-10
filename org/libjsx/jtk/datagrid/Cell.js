@@ -1,14 +1,12 @@
 
-
 var Cell = function(datagrid, name) {
 
 	var self = this;
 	this.name = name;
 	this.input;
 	this.div;	
-	this.datagrid = datagrid;	
-	this.width = datagrid.getCellWidth();
-
+	this.datagrid = datagrid;
+	this.editable = true;	
 	
 	this.setName = function(name) {
 		self.name = name;
@@ -16,10 +14,6 @@ var Cell = function(datagrid, name) {
 	
 	this.getName = function() {
 		return self.name;
-	}
-	
-	this.getWidth = function() {
-		return self.width;
 	}
 	
 	this.getDiv = function() {
@@ -39,26 +33,36 @@ var Cell = function(datagrid, name) {
 		self.div.innerHTML = v;
 	}
 	
+	this.isEditable = function() {
+		return self.editable;
+	}
+	
+	this.setEditable = function(e) {
+		self.editable = e;
+	}
+	
 	this.isOpened = function() {
 		return (self.input.getAttribute("type") == "text");
 	}
 	
-	this.createInput = function() {
+	this.showInput = function() {
 		var value = (self.div.innerHTML != "&nbsp;")?self.div.innerHTML:"";
 		if (document.all) { // if IE then welcome to the gambias
 			var name = self.input.name;
-			self.input = document.createElement("<input type='text' id='"+self.getName()+"' name='"+self.getName()+"' style='width: "+self.getWidth()+"px;' />");
+			self.input = document.createElement("<input type='text' id='"+self.getName()+"' name='"+self.getName()+"' style='width: "+self.datagrid.getCellWidth()+"px; height: "+self.datagrid.getCellHeight()+"px;' />");
+			self.input.setAttribute("value", value);
 		} else {			
 			self.input.setAttribute('type', 'text');			
-			self.input.style.width = self.getWidth()+"px";
-		}
-		self.input.setAttribute("value", value);
+			self.input.style.width = self.datagrid.getCellWidth()+"px";
+			self.input.style.height = self.datagrid.getCellHeight()+"px";
+		}		
 		self.input.focus();
 		self.input.select();
-		self.div.innerHTML = "";
+		self.setValue(value);
+		self.div.style.display = "none";
 	}
 	
-	this.removeInput = function() {
+	this.hideInput = function() {
 		if (self.isOpened()) {
 			if (document.all) { // if IE then welcome to the gambias
 				var name = self.input.name;
@@ -66,22 +70,24 @@ var Cell = function(datagrid, name) {
 				self.input = document.createElement("<input type='hidden' name='"+name+"' />");
 				self.input.setAttribute("value", value);
 				self.div.innerHTML = value;
+				self.setValue(value);
 			} else {
 				var value = (self.input.value != "")?self.input.value:"&nbsp;";
 				self.input.setAttribute("type", "hidden");
-				self.input.value = value;
-				self.div.innerHTML = value;
+				self.setValue(value);
 			}
+			self.div.style.display = "block";
 		}
 	}
 	
 	this.changeForEditable = function(editable) {
 		if (editable)
-			self.createInput();
+			self.showInput();
 		else
-			self.removeInput();
+			self.hideInput();
 	}	
-
+	
+	
 	if (document.all) { // if IE then welcome to the gambias
 		this.input = document.createElement("<input type='hidden'  id='"+self.getName()+"'  name='"+self.getName()+"' />");
 	} else {
@@ -93,14 +99,20 @@ var Cell = function(datagrid, name) {
 	this.input.setAttribute("type", "hidden");
 	this.div = document.createElement("div");
 	this.div.innerHTML = "&nbsp;";
+	this.div.style.width = self.datagrid.getCellWidth()+"px";
+	this.div.style.height = self.datagrid.getCellHeight()+"px";
+	this.div.className = self.datagrid.CELL_CLASS;
 	
 	this.div.ondblclick = function() {
-		self.changeForEditable(true);
+		if (self.isEditable())
+			self.changeForEditable(true);
 	}
 	
 	this.div.onclick = function() {
-		self.datagrid.highlightCell();
-		self.datagrid.setCurrentCell(self);				
+		if (self.isEditable()) {
+			self.datagrid.closeLastCell();
+			self.datagrid.setCurrentCell(self);
+		}
 	}
 	
 	this.input.onkeypress = function(e) {
@@ -108,6 +120,5 @@ var Cell = function(datagrid, name) {
 		if (key == 13) // <ENTER>
 			self.changeForEditable(false);
 	}
-		
 
 }

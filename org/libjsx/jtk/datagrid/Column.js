@@ -6,7 +6,12 @@ var Column = function(datagrid, cell) {
 	this.datagrid = datagrid;
 	this.col = document.createElement("td");
 	this.col.appendChild(cell.getInput());
-	this.col.appendChild(cell.getDiv());	
+	this.col.appendChild(cell.getDiv());
+	this.col.className = self.datagrid.COLUMN_CLASS;
+	
+	this.col.onclick = function() {
+		self.datagrid.setCurrentColumn(self);
+	}	
 	
 	this.getCell = function() {
 		return self.cell;

@@ -1,0 +1,37 @@
+
+.libjsx-datagrid {
+	background: #FFFFFF;	
+}
+
+.libjsx-datagrid .libjsx-datagrid-row {
+	background: #ffffff;
+}
+
+.libjsx-datagrid .libjsx-datagrid-row-actived {
+	background: #f1f1f1;
+}
+
+.libjsx-datagrid .libjsx-datagrid-column {
+	border: 1px solid #cccccc;
+}
+
+.libjsx-datagrid .libjsx-datagrid-column-actived {
+	font: 12px Verdana, Arial, Sans-serif;
+	color: #333333;
+	border: 1px solid red;
+}
+
+.libjsx-datagrid .libjsx-datagrid-column .libjsx-datagrid-cell,
+.libjsx-datagrid .libjsx-datagrid-column .libjsx-datagrid-cell-actived {
+	font: 12px Verdana, Arial, Sans-Serif;
+	color: #000000;
+}
+
+.libjsx-datagrid .libjsx-datagrid-title .libjsx-datagrid-cell, 
+.libjsx-datagrid .libjsx-datagrid-title .libjsx-datagrid-cell-actived {
+	font: 12px Verdana, Arial, Sans-serif;
+	color: #ffffff;
+	text-align: center;
+	background: #333333;
+}
+
