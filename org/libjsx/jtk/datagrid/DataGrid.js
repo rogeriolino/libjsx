@@ -1,3 +1,7 @@
+JSX.import("org.libjsx.core.Keyboard");
+JSX.import("org.libjsx.jtk.datagrid.Cell");
+JSX.import("org.libjsx.jtk.datagrid.Row");
+JSX.import("org.libjsx.jtk.datagrid.Column");
 /**
  *
  * DataGrid v 0.1
@@ -16,9 +20,6 @@ var DataGrid = function(lin, col) {
 	this.titles = new Array(col);	
 	this.rows = new Array(lin);
 	
-	this.cellWidth = 100;	
-	this.cellHeight = 30;
-	
 	this.currentRow = null;	
 	this.currentCell = null;
 	this.currentColumn = null;
@@ -35,18 +36,24 @@ var DataGrid = function(lin, col) {
 	
 	this.datagrid = document.createElement("table");
 	this.datagrid.className = this.name;
-	with (this.datagrid) {
-		style.border = "1px solid #000000";
-		style.cursor = "default";
-		cellSpacing = "0";
-	}	
-	
+	this.datagrid.cellSpacing = "0";
+		
 	this.setName = function(name) {
 		self.name = name;
 	}
 	
 	this.getName = function() {
 		return self.name;
+	}
+	
+	this.setTitle = function(i, content) {
+		var cell = self.getTitle(i);
+		cell.setValue(content);
+	}
+	
+	this.getTitle = function(i) {
+		if (i >=0 && i < self.titles.length)
+			return self.titles[i];
 	}
 	
 	this.setCell = function(lin, col, content) {
@@ -71,27 +78,6 @@ var DataGrid = function(lin, col) {
 	this.getColumns = function(row) {
 		var linha = self.getRow(row);
 		return linha.getColumns();
-	}
-		
-	this.setCellSize = function(w, h) {
-		self.setCellWidth(w);
-		self.setCellHeight(h);
-	}
-	
-	this.setCellWidth = function(w) {
-		self.cellWidth = w;
-	}
-	
-	this.getCellWidth = function() {
-		return self.cellWidth;
-	}
-	
-	this.setCellHeight = function(h) {
-		self.cellHeight = h;
-	}
-	
-	this.getCellHeight = function() {
-		return self.cellHeight;
 	}
 	
 	this.setCurrentCell = function(cell) {
@@ -178,13 +164,14 @@ var DataGrid = function(lin, col) {
 		var k = -1
 		var l = 0;
 		for (var i=0; i<self.titles.length; i++) {			
-			var cell = new Cell(this, self.getName()+"_title_"+i);
-			cell.setEditable(false);			
+			var cell = new Cell(this, self.getName()+"_title_"+i , i);
+			cell.setEditable(false);
 			if (l >= self.chars.length) { k++; l = 0; }
 			if (k >= self.chars.length) k = 0;
 			cell.setValue(self.getTitleValue(l, k));
 			l++;
 			linha.add(cell);
+			linha.last().setTitle(true);
 			self.titles[i] = cell;			
 		}
 		thead.appendChild(linha.getRow());
@@ -192,10 +179,10 @@ var DataGrid = function(lin, col) {
 		var tbody = document.createElement("tbody");
 		// body
 		for (var i=0; i<self.rows.length; i++) {
-			linha = new Row(self);
+			linha = new Row(self, i);
 			self.rows[i] = linha;
 			for (var j=0; j<col; j++) {
-				var cell = new Cell(this, self.getName()+"_"+i+"_"+j);
+				var cell = new Cell(this, self.getName()+"_"+i+"_"+j, j);
 				linha.add(cell);
 			}
 			tbody.appendChild(linha.getRow());
@@ -226,12 +213,40 @@ var DataGrid = function(lin, col) {
 	}
 	
 	this.pack = function(target) {
-		self.mount();
-		document.getElementById(target).appendChild(self.datagrid);
+		self.mount();		
+		
+		Keyboard.addEvent(
+			function(e) {
+				var key = Keyboard.getKeyCode(e);			    
+			    if (self.getCurrentCell() && self.getCurrentColumn() && self.getCurrentRow()) {		    
+				    var ri = self.getCurrentRow().getIndex();
+			    	var ci = self.getCurrentColumn().getCell().getIndex();
+				    if (key == 13) { // <ENTER>
+				  		self.getCurrentCell().toggle();
+				    } 
+				    else if (!self.getCurrentCell().isOpened()) {
+					    if (key == Keyboard.LEFT && ci > 0)
+					    	ci--;		    	
+					    if (key == Keyboard.UP && ri > 0)
+		  				    ri--;
+					    if (key == Keyboard.RIGHT && ci < self.getCurrentRow().getSize()-1)
+					    	ci++;
+					    if (key == Keyboard.DOWN && ri < self.getRows().length-1)
+						    ri++;
+					    self.setCurrentRow(self.getRow(ri));
+					    self.setCurrentColumn(self.getRow(ri).get(ci));
+					    self.setCurrentCell(self.getCurrentColumn().getCell());
+				    }
+			    }
+		    }	    
+		  );
+	    
+	    Object.pack(target, self.datagrid);
+		
 	}
 	
 	// events
 	this.onChangeRow = function() {}
-	this.onChangeCell = function() {}
+	this.onChangeCell = function() {}	
 	
 }
