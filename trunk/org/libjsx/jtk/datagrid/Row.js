@@ -1,13 +1,22 @@
 
-var Row = function(datagrid) {
+var Row = function(datagrid, i) {
 
 	var self = this;
+	this.index = i;
 	this.datagrid = datagrid;
-	this.cols = new Array();	
+	this.cols = new Array();
 	this.title = false;
 	
 	this.row = document.createElement("tr");
 	this.row.className = self.datagrid.ROW_CLASS;
+	
+	this.setIndex = function(i) {
+		self.index = i;
+	}
+	
+	this.getIndex = function() {
+		return self.index;
+	}
 	
 	this.isTitle = function() {
 		return self.title;
@@ -36,6 +45,10 @@ var Row = function(datagrid) {
 		if (i >= 0 && i < self.getSize())
 			return self.cols[i];
 		return false;
+	}
+	
+	this.last = function() {		
+		return self.get(self.getSize()-1);
 	}
 	
 	this.getColumns = function() {

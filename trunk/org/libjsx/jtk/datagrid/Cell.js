@@ -1,7 +1,8 @@
 
-var Cell = function(datagrid, name) {
+var Cell = function(datagrid, name, i) {
 
 	var self = this;
+	this.index = i;
 	this.name = name;
 	this.input;
 	this.div;	
@@ -14,6 +15,14 @@ var Cell = function(datagrid, name) {
 	
 	this.getName = function() {
 		return self.name;
+	}
+	
+	this.setIndex = function(i) {
+		self.index = i;
+	}
+	
+	this.getIndex = function() {
+		return self.index;
 	}
 	
 	this.getDiv = function() {
@@ -46,42 +55,27 @@ var Cell = function(datagrid, name) {
 	}
 	
 	this.showInput = function() {
-		var value = (self.div.innerHTML != "&nbsp;")?self.div.innerHTML:"";
-		if (document.all) { // if IE then welcome to the gambias
-			var name = self.input.name;
-			self.input = document.createElement("<input type='text' id='"+self.getName()+"' name='"+self.getName()+"' style='width: "+self.datagrid.getCellWidth()+"px; height: "+self.datagrid.getCellHeight()+"px;' />");
-			self.input.setAttribute("value", value);
-		} else {			
-			self.input.setAttribute('type', 'text');			
-			self.input.style.width = self.datagrid.getCellWidth()+"px";
-			self.input.style.height = self.datagrid.getCellHeight()+"px";
-		}		
-		self.input.focus();
-		self.input.select();
-		self.setValue(value);
-		self.div.style.display = "none";
+		if (!self.isOpened() && self.isEditable()) {
+			var value = (self.div.innerHTML != "&nbsp;")?self.div.innerHTML:"";
+			self.input.setAttribute('type', 'text');
+			self.input.focus();
+			self.input.select();
+			self.setValue(value);
+			self.div.style.display = "none";
+		}
 	}
 	
 	this.hideInput = function() {
 		if (self.isOpened()) {
-			if (document.all) { // if IE then welcome to the gambias
-				var name = self.input.name;
-				var value = (self.input.value != "")?self.input.value:"&nbsp;";
-				self.input = document.createElement("<input type='hidden' name='"+name+"' />");
-				self.input.setAttribute("value", value);
-				self.div.innerHTML = value;
-				self.setValue(value);
-			} else {
-				var value = (self.input.value != "")?self.input.value:"&nbsp;";
-				self.input.setAttribute("type", "hidden");
-				self.setValue(value);
-			}
+			var value = (self.input.value != "")?self.input.value:"&nbsp;";
+			self.input.setAttribute("type", "hidden");
+			self.setValue(value);
 			self.div.style.display = "block";
 		}
 	}
 	
-	this.changeForEditable = function(editable) {
-		if (editable)
+	this.toggle = function() {
+		if (!self.isOpened())
 			self.showInput();
 		else
 			self.hideInput();
@@ -99,13 +93,11 @@ var Cell = function(datagrid, name) {
 	this.input.setAttribute("type", "hidden");
 	this.div = document.createElement("div");
 	this.div.innerHTML = "&nbsp;";
-	this.div.style.width = self.datagrid.getCellWidth()+"px";
-	this.div.style.height = self.datagrid.getCellHeight()+"px";
 	this.div.className = self.datagrid.CELL_CLASS;
 	
 	this.div.ondblclick = function() {
 		if (self.isEditable())
-			self.changeForEditable(true);
+			self.toggle();
 	}
 	
 	this.div.onclick = function() {
@@ -115,10 +107,5 @@ var Cell = function(datagrid, name) {
 		}
 	}
 	
-	this.input.onkeypress = function(e) {
-		var key = (window.event)?event.keyCode:e.keyCode;
-		if (key == 13) // <ENTER>
-			self.changeForEditable(false);
-	}
 
 }
