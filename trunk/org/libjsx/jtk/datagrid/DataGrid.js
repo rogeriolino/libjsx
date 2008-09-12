@@ -476,7 +476,7 @@ var Cell = function(datagrid, name, i) {
 			self.toggle();
 	}
 	
-	Event.addEvent(Mouse.ON_DB_CLICK, this.div, this.onDoubleClick);
+	Event.addEvent(Mouse.ON_DBL_CLICK, this.div, this.onDoubleClick);
 	
 	this.onClick = function() {
 		if (self.isEditable()) {
