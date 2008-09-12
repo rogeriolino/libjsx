@@ -27,6 +27,10 @@ var JSX = {
 
 	version: "1.0",
 	
+	DOM : {
+		selectedElement : null
+	},
+	
 	
 	import : function(package) {
 				var pkgs = package.split(".");
