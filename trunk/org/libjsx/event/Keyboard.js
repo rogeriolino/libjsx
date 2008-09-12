@@ -20,18 +20,13 @@ var Keyboard = {
 	F10      : 121,
 	F11      : 122,
 	F12      : 123,
+	// Event
+	ON_PRESS : (window.addEventListener)?'keypress':'onkeypress',
+	ON_DOWN  : '',
+	ON_UP    : '',
 	
 	getKeyCode : function(e) {
 			return (window.event)?event.keyCode:e.keyCode;
-		},
-	
-	addEvent : function(callback) {
-		var oldonkeypress = document.onkeypress;
-		document.onkeypress = function(e) {
-			if (oldonkeypress != null) 
-				oldonkeypress();
-			callback(e);
-		}
-	}
+		},	
 
 }
