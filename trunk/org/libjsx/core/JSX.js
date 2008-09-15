@@ -33,52 +33,8 @@ var JSX = {
 		selectedElement : null
 	},
 	
-	import : function(package) {
-			var pkgs = package.split(".");
-	},
-	
 	get : function(id) {
 		return document.getElementById(id);
-	},	
-	
-	add : function(element, child) {
-   		element.appendChild(child);
-	},
-	
-	drag : function(element) {
-		/**
-		 * TODO: get element offset (x and y)
-		 */
-		element._ELEMENT_CLICKED_ = false;
-		Event.addEvent(Mouse.ON_DOWN, element, function() { element._ELEMENT_CLICKED_ = true; });
-		Event.addEvent(Mouse.ON_RELEASE, element, function() { element._ELEMENT_CLICKED_ = false; });  
-		Event.addEvent(Mouse.ON_MOVE, document, 
-				function(e) {
-					e = e?e:window.event; 
-					if (element._ELEMENT_CLICKED_) {
-						with (element.style) {
-							top = (e.clientY - 10) + "px";
-							left = (e.clientX - 10) + "px";
-							position = "absolute";
-						}
-					} 
-				}
-		);		
-		
-	},
-	
-	alpha : function(element, a) {
-		if (a >= 0.0 && a <= 1.0) {			
-			with (element.style) {
-				opacity = a;
-				filter = "opacity(alpha="+(a*100)+")";
-			}
-		}
-	},
-	
-	dispose : function(element) {
-		var node = element.parentNode;
-    	node.parentNode.removeChild(element);		
 	},
 	
 	onerror : function(msg, url, line) {
@@ -105,7 +61,7 @@ var JSX = {
 	},
 
 	blackout : function() {
-	    var div = document.createElement("div");
+	    var div = Node.new("div");
 	    div.setAttribute("id", WINDOW_BLACKOUT_ID);
 	    JSX.getBody().appendChild(div);
 	    return div;
@@ -166,68 +122,6 @@ var JSX = {
 }
 
 window.onerror = JSX.onerror;
-
-Node.prototype.add = function(el) { JSX.add(this, el); }
-Node.prototype.dispose = function() { JSX.dispose(this); }
-Node.prototype.drag = function() { JSX.drag(this); }
-Node.prototype.alpha = function(a) { JSX.alpha(this, a); }
-
-var Event = {
-				
-	addEvent : function(event, element, callback) {
-		if(window.addEventListener) // Mozilla, Netscape, Firefox
-		    element.addEventListener(event, callback, false)
-		else // IE
-		    element.attachEvent(event, callback)
-	}
-
-}
-
-var Keyboard = {
-		
-	ESC      : 27,
-	ENTER    : 13,	
-	// ARROWS KEY
-	LEFT     : 37,
-	UP       : 38,
-	RIGHT    : 39,
-	DOWN     : 40,	
-	// FN
-	F1       : 112,
-	F2       : 113,
-	F3       : 114,
-	F4       : 115,
-	F5       : 116,
-	F6       : 117,
-	F7	     : 118,
-	F8       : 119,
-	F9       : 120,
-	F10      : 121,
-	F11      : 122,
-	F12      : 123,
-	// Event
-	ON_PRESS : (window.addEventListener)?'keypress':'onkeypress',
-	ON_DOWN  : '',
-	ON_UP    : '',
-	
-	getKeyCode : function(e) {
-		return (window.event)?event.keyCode:e.keyCode;
-	}
-
-}
-
-var Mouse = {
-	// BUTTONS
-	LEFT     : 1,
-	RIGHT    : 2,
-	CENTER   : 3,	
-	// Event
-	ON_CLICK     : (window.addEventListener)?'click':'onclick',
-	ON_DBL_CLICK : (window.addEventListener)?'dblclick':'ondblclick',	
-	ON_RELEASE   : (window.addEventListener)?'mouseup':'onmouseup',	
-	ON_DOWN      : (window.addEventListener)?'mousedown':'onmousedown',
-	ON_MOVE      : 	(window.addEventListener)?'mousemove':'onmousemove',
-}
 
 Object.prototype.pack = function(target, element) {
 	document.getElementById(target).appendChild(element);

@@ -39,7 +39,7 @@ var DataGrid = function(lin, col) {
 	this.CELL_CLASS = "libjsx-datagrid-cell";
 	this.CELL_ACTIVED_CLASS = "libjsx-datagrid-cell-actived";
 	
-	this.datagrid = document.createElement("table");
+	this.datagrid = Node.new("table");
 	this.datagrid.className = this.name;
 	this.datagrid.cellSpacing = "0";
 		
@@ -161,7 +161,7 @@ var DataGrid = function(lin, col) {
 		var coluna;
 		var input;
 		var div;
-		var thead = document.createElement("thead");
+		var thead = Node.new("thead");
 		// header (titles)
 		linha = new Row(self);
 		linha.getRow().className = self.TITLE_CLASS;
@@ -181,7 +181,7 @@ var DataGrid = function(lin, col) {
 		}
 		thead.appendChild(linha.getRow());
 		self.datagrid.appendChild(thead);
-		var tbody = document.createElement("tbody");
+		var tbody = Node.new("tbody");
 		// body
 		for (var i=0; i<self.rows.length; i++) {
 			linha = new Row(self, i);
@@ -194,18 +194,18 @@ var DataGrid = function(lin, col) {
 		}
 		self.datagrid.appendChild(tbody);
 		// footer
-		var tfooter = document.createElement("tfooter");
+		var tfooter = Node.new("tfoot");
 		if (document.all) { // IE
-			tfooter.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_rows' name='"+self.getName()+"_rows' value='"+lin+"' />"));
-			tfooter.appendChild(document.createElement("<input type='hidden' id='"+self.getName()+"_cols' name='"+self.getName()+"_cols' value='"+col+"' />"));
+			tfooter.appendChild(Node.new("<input type='hidden' id='"+self.getName()+"_rows' name='"+self.getName()+"_rows' value='"+lin+"' />"));
+			tfooter.appendChild(Node.new("<input type='hidden' id='"+self.getName()+"_cols' name='"+self.getName()+"_cols' value='"+col+"' />"));
 		} else {
-			var n_linhas = document.createElement("input");
+			var n_linhas = Node.new("input");
 			n_linhas.setAttribute("type", "hidden");
 			n_linhas.setAttribute("id", self.getName()+"_rows");
 			n_linhas.setAttribute("name", self.getName()+"_rows");
 			n_linhas.setAttribute("value", lin);
 			
-			var n_colunas = document.createElement("input");
+			var n_colunas = Node.new("input");
 			n_colunas.setAttribute("type", "hidden");
 			n_colunas.setAttribute("id", self.getName()+"_cols");
 			n_colunas.setAttribute("name", self.getName()+"_cols");
@@ -274,7 +274,7 @@ var Row = function(datagrid, i) {
 	this.cols = new Array();
 	this.title = false;
 	
-	this.row = document.createElement("tr");
+	this.row = Node.new("tr");
 	this.row.className = self.datagrid.ROW_CLASS;
 	
 	this.onClick = function() {
@@ -339,7 +339,7 @@ var Column = function(datagrid, cell) {
 	this.cell = cell;
 	this.title = false;
 	this.datagrid = datagrid;
-	this.col = document.createElement("td");
+	this.col = Node.new("td");
 	this.col.appendChild(cell.getInput());
 	this.col.appendChild(cell.getDiv());
 	this.col.className = self.datagrid.COLUMN_CLASS;
@@ -459,15 +459,15 @@ var Cell = function(datagrid, name, i) {
 	
 	
 	if (document.all) { // if IE then welcome to the gambias
-		this.input = document.createElement("<input type='hidden'  id='"+self.getName()+"'  name='"+self.getName()+"' />");
+		this.input = Node.new("<input type='hidden'  id='"+self.getName()+"'  name='"+self.getName()+"' />");
 	} else {
-		this.input = document.createElement("input");
+		this.input = Node.new("input");
 		this.input.setAttribute("type", "hidden");
 		this.input.setAttribute("id", self.getName());
 		this.input.setAttribute("name", self.getName());
 	}
 	this.input.setAttribute("type", "hidden");
-	this.div = document.createElement("div");
+	this.div = Node.new("div");
 	this.div.innerHTML = "&nbsp;";
 	this.div.className = self.datagrid.CELL_CLASS;
 	
