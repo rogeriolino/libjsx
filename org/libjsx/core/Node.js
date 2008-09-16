@@ -51,17 +51,22 @@ Node.prototype.alpha = function(a) {
 	}
 }
 
-Node.prototype.blink = function() {
-	var element = this; 
-	element.alpha(0);
-	setInterval(
-		function() {
-			if (element.style.opacity == 0)
-				element.alpha(1);
-			else
-				element.alpha(0);
-		}
-	, 300);
+Node.prototype.blink = function(on) {
+	var element = this;	
+	if (on === true) {
+		element.alpha(0);		
+		element._BLINKING_ = setInterval(
+			function() {
+				if (element.style.opacity == 0)
+					element.alpha(1);
+				else
+					element.alpha(0);
+			}
+		, 300);
+	} else if (on === false) {
+		element.alpha(1);
+		clearInterval(element._BLINKING_);
+	}
 }
 
 Node.prototype.drag = function() {
