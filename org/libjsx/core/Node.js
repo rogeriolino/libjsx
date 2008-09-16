@@ -42,6 +42,28 @@ Node.prototype.hide = function() {
 	this.style.display = "";
 }
 
+Node.prototype.alpha = function(a) {
+	if (a >= 0.0 && a <= 1.0) {			
+		with (this.style) {
+			opacity = a;
+			filter = "opacity(alpha="+(a*100)+")";
+		}
+	}
+}
+
+Node.prototype.blink = function() {
+	var element = this; 
+	element.alpha(0);
+	setInterval(
+		function() {
+			if (element.style.opacity == 0)
+				element.alpha(1);
+			else
+				element.alpha(0);
+		}
+	, 300);
+}
+
 Node.prototype.drag = function() {
 	/**
 	 * TODO: get element offset (x and y)
@@ -73,13 +95,4 @@ Node.prototype.drag = function() {
 			}
 	);		
 		
-}
-
-Node.prototype.alpha = function(a) {
-	if (a >= 0.0 && a <= 1.0) {			
-		with (this.style) {
-			opacity = a;
-			filter = "opacity(alpha="+(a*100)+")";
-		}
-	}
 }
