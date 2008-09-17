@@ -26,7 +26,7 @@ Node.new = function(tagname) {
 } 
 
 Node.prototype.add = function(el) {
-	this.appendChild(child);
+	this.appendChild(el);
 }
 
 Node.prototype.dispose = function() { 
