@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="author" content="Rogério Alencar Lino Filho" />
+<link rel="stylesheet" type="text/css" href="/media/dados/workspace/libjsx/org/libjsx/jtk/style/cleanLook/css/default.css" />
+<script type="text/javascript" src="../libjsx/core/JSX.js"></script>
+<script type="text/javascript" src="../libjsx/core/Window.js"></script>
+<script type="text/javascript" src="../libjsx/core/Node.js"></script>
+<script type="text/javascript" src="../libjsx/core/Event.js"></script>
+<script type="text/javascript" src="../libjsx/core/Mouse.js"></script>
+<script type="text/javascript" src="../libjsx/core/Keyboard.js"></script>
+<script type="text/javascript" src="../libjsx/jtk/datagrid/DataGrid.js"></script>
+<script type="text/javascript">
+
+    window.onload = function() {
+        try {               
+                   
+            var dg = new DataGrid(15, 10);
+            dg.pack("teste");
+            dg.setCell(1,1, "hello world");
+            
+            var dg2 = new DataGrid(5, 2); 
+            dg2.pack("teste");
+            dg2.setTitle(0, "Produto");
+            dg2.setTitle(1, "Quantidade");
+            dg2.setCell(0,0, "TESTE");                        
+            
+            
+        } catch (e) {
+            alert(e);
+        }        
+    }
+
+</script>
+</head>
+<body>
+    <div id="teste">        
+    </div>
+</body>
+</html>

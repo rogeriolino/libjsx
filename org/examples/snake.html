@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="author" content="Rogério Alencar Lino Filho" />
+<link rel="stylesheet" type="text/css" href="/media/dados/workspace/libjsx/org/libjsx/jtk/style/cleanLook/css/default.css" />
+<script type="text/javascript" src="../libjsx/core/JSX.js"></script>
+<script type="text/javascript" src="../libjsx/core/Window.js"></script>
+<script type="text/javascript" src="../libjsx/core/Node.js"></script>
+<script type="text/javascript" src="../libjsx/core/Event.js"></script>
+<script type="text/javascript" src="../libjsx/core/Mouse.js"></script>
+<script type="text/javascript" src="../libjsx/core/Keyboard.js"></script>
+<script type="text/javascript">
+
+    var Grid = function(r, c) {
+        
+        var self = this;
+        this.grid = Array(r);
+        this._g = Node.new("table");
+        this._g.cellSpacing = "0";
+        this._gb = Node.new("tbody");
+        this._g.add(Node.new("thead"));
+        this._g.add(this._gb);
+        this._g.add(Node.new("tfoot"));
+        
+        this.getTile = function(r, c) {
+            return self.grid[r][c];
+        }
+        
+        this.getTotalRows = function() {
+            return self.grid.length;
+        }
+        
+        this.getTotalColumns = function() {
+            return self.grid[0].length;
+        }
+        
+        this.getGrid = function() {
+            return self._g;
+        }
+        
+        for (var i=0; i<this.grid.length; i++) {
+            this.grid[i] = Array(c);
+            var _gr = Node.new("tr")
+            this._gb.add(_gr);
+            for (var j=0; j<this.grid[i].length; j++) {
+                this.grid[i][j] = new Tile(1);
+                _gr.add(this.grid[i][j].getTile());
+            }
+        }        
+    }
+    
+    var Tile = function(walkable) {    
+        var self = this;
+        this.tile = Node.new("td");
+        this.tile.innerHTML = "&nbsp;";
+        this.walkable = (walkable == true);                
+        
+        this.getTile = function() {
+            return self.tile;
+        }        
+        
+        this.setWalkable = function(w) {
+            self.walkable = (w == true);
+            if (self.walkable)
+                this.tile.className = "walkable";
+            else
+                this.tile.className = "non-walkable";
+        }
+        
+        this.isWalkable = function() {
+            return self.walkable;
+        }
+        
+        this.setWalkable(this.walkable);
+    }
+    
+    var Snake = function(grid, r, c) {
+        var self = this;
+        this.grid = grid;
+        this.body = Array();
+        this.body[0] = [r, c];
+        this.body[1] = [r+1, c];
+        this.body[2] = [r+2, c];
+        this.body[3] = [r+3, c];
+        this.time = 0;
+        this.oldTiles = Array();
+        this.dead = false;      
+        
+        this.dir = Snake.UP;
+        
+        this.getBody = function() {
+            return self.body;
+        }
+        
+        this.setDir = function(d) {
+            if (self.dir + d != 0)
+                self.dir = d;
+        }
+        
+        this.getDir = function() {
+            return self.dir;
+        }
+        
+        this.grow = function() {
+            self.body[self.body.length] = self.body[self.body.length-1];
+        }
+        
+        this.isDead = function() {
+            return self.dead;
+        }
+        
+        this.isSnake = function(r, c) {
+            for (var i=1; i<self.body.length; i++) {
+                var a = self.body[i][0];
+                var b = self.body[i][1];
+                if (r == a && c == b)                    
+                    return true;
+            }
+            return false;
+        }
+        
+        this.update = function(intertime) {            
+            self.time += intertime;
+            JSX.get("debug").innerHTML = "Intertime: " + intertime + "<br/>Time: " + self.time;
+            if (!self.isDead() && self.time > 0.00) {
+                self.time = 0;
+                var k = self.getBody().length-1;
+                var last = self.grid.getTile(self.getBody()[k][0], self.getBody()[k][1]).getTile();            
+                var tmp = self.getBody()[0];
+                for (var i=1; i<self.body.length; i++) {
+                    var aux = self.getBody()[i];
+                    self.getBody()[i] = tmp;
+                    tmp = aux;               
+                    self.grid.getTile(self.getBody()[i][0], self.getBody()[i][1]).getTile().className = "snake";
+                }
+                var r = self.body[0][0];
+                var c = self.body[0][1];
+                if (self.getDir() == Snake.UP)
+                    self.getBody()[0] = [r-1, c];
+                else if (self.getDir() == Snake.DOWN)
+                    self.getBody()[0] = [r+1, c];
+                else if (self.getDir() == Snake.LEFT)
+                    self.getBody()[0] = [r, c-1];
+                else if (self.getDir() == Snake.RIGHT)
+                    self.getBody()[0] = [r, c+1];
+                last.className = "walkable";
+                self.grid.getTile(self.getBody()[0][0], self.getBody()[0][1]).getTile().className = "snake-head";            
+                r = self.body[0][0];
+                c = self.body[0][1];
+                if (!self.grid.getTile(r, c).isWalkable() || self.isSnake(r, c)) {
+                    self.dead = true;
+                }
+            }
+        }        
+    }
+    
+    Timer = {
+        sec : 100
+    }
+    
+    Snake.UP = -1;
+    Snake.DOWN = 1;
+    Snake.LEFT = 2;
+    Snake.RIGHT = -2;
+
+    window.onload = function() {
+        //try {        
+            
+            //alert("JSX Version: " + JSX.version);         
+                   
+            var _g = new Grid(15, 15);           
+            
+            for (var i=0; i<_g.getTotalRows(); i++) {                
+                _g.getTile(i, 0).setWalkable(false);
+                _g.getTile(i, _g.getTotalColumns()-1).setWalkable(false);
+            }
+            for (var j=0; j<_g.getTotalColumns(); j++) {
+                _g.getTile(0, j).setWalkable(false);
+                _g.getTile(_g.getTotalRows()-1, j).setWalkable(false);
+            }
+            
+            var _s = new Snake(_g, 5, 5);
+            
+            _g.pack('teste', _g.getGrid());
+            
+            Event.addEvent(Keyboard.ON_PRESS, document, 
+                function(e) {
+                    var key = Keyboard.getKeyCode(e);
+                    if (key == Keyboard.UP)
+                        _s.setDir(Snake.UP);
+                    if (key == Keyboard.DOWN)
+                        _s.setDir(Snake.DOWN);
+                    if (key == Keyboard.LEFT)
+                        _s.setDir(Snake.LEFT);
+                    if (key == Keyboard.RIGHT)
+                        _s.setDir(Snake.RIGHT);
+                }
+            );
+            
+            var start = 0;
+            var end = 0;
+            var intertime = 0;
+            var currentTime = 0;
+            var currentFPS = 0;
+            var debug = JSX.get("fps");
+            var _fps = 0;
+            var interval = setInterval(function() {                
+                start = new Date().getTime();
+                _s.update(intertime);
+                if (_s.isDead()) {
+                    //clearInterval(interval);
+                    //window.alert("X|");
+                }
+                end = new Date().getTime();
+                if (end - currentTime > 1000) {
+                    currentTime = end;
+                    _fps = currentFPS;
+                    currentFPS = 0;                    
+                } else {
+                    currentFPS++;
+                }
+                msintertime = end - start;
+                intertime = msintertime/1000;
+                debug.innerHTML = "FPS: " + _fps;
+            }, Timer.sec);            
+            
+                
+            
+        //} catch (e) {
+          //  alert(e);
+        //}        
+    }
+
+
+</script>
+<style type="text/css">
+
+table tr td {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #D1D1D1;
+}
+
+table tr td.snake {
+    background: #00FF00;
+}
+
+table tr td.snake-head {
+    background: #FF0000;
+}
+
+table tr td.walkable {
+    background: #F1F1F1;
+}
+
+table tr td.non-walkable {
+    background: #000000;
+}
+
+</style>
+</head>
+<body>
+    <div id="fps">0</div>
+    <div id="teste"></div>    
+    <div id="debug"></div>
+</body>
+</html>
